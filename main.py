@@ -1,5 +1,6 @@
 import serial
 import struct
+import time
 
 READ_REGISTER = 0x03
 WRITE_REGISTER = 0x06
@@ -69,6 +70,24 @@ def read_set_temp():
 		print ("invalid length")
 	
 
+def temp_ramp_test(dwell_time):
+	print ('Beginning Temperature Ramp Testing')
+
+	testing_temps = [27, 30, 35, 37, 40]
+	for t in testing_temps:
+		print ('Setting Temp To:', t)
+		set_temp(t)
+		time.sleep(1)
+		ser.flushInput()
+
+		while abs(read_set_temp() - read_temp()) > 0.5:
+			print (read_set_temp() - read_temp())
+			time.sleep(5)
+		
+		print ('Set Temp Reached, Holding for ', dwell_time, ' seconds')
+		time.sleep(dwell_time)
+		
+	set_temp(10)
 
 try:
 	ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
@@ -85,8 +104,14 @@ try:
 	#value = struct.unpack('>h', data_bytes)[0]
 	#setpoint = value / 10.0
 	#print (setpoint)
-
-	print (read_set_temp())
+	
+	#set_temp(30)
+	#time.sleep(1)
+	#ser.flushInput()
+	#while True:
+	#	print ('current temp is:', read_temp())
+	#	time.sleep(1)
+	temp_ramp_test(3600)
 	ser.close()
 	
 except KeyboardInterrupt:
