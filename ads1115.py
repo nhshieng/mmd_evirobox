@@ -8,7 +8,7 @@ class Sensor:
 	def __init__(self, ads, port):
 		self.ads = ads
 		self.port = port
-		self.tare = None
+		self.tareval = None
 	
 	def setup(self):
 		gas_sensor = AnalogIn(self.ads, self.port)
@@ -23,8 +23,8 @@ class Sensor:
 			read_counter += 1
 			time.sleep(0.1)
 
-		self.tare = [read_running_total / 10]
-		return self.tare
+		self.tareval = [read_running_total / 10]
+		return self.tareval
 
 def i2c_setup():
 	i2c = busio.I2C(board.SCL, board.SDA)
@@ -54,23 +54,18 @@ def tare_sensors(sensor):
 	
 	return averaged_read_values
 
-def read_tare_values():
-	with open('tare.txt', 'r') as file:
-		tare_values = file.readlines()
-		tare_values = [int(number.strip()) for number in tare_values]
-	return tare_values
 
-def read_sensors(readings, time):
-	read_running_total = [] * len(channels)
+
+def read_sensor(sensor):
+	readings = 10
+	time = 0.1
 	read_counter = 0
+	read_running_total = 0
 
 	while read_counter < readings:
-		channel_counter = 0
-		for channel in channels:
-			read_running_total[channel_counter] += channel.value
-			channel_counter += 1	
+		read_running_total += sensor.value
 		read_counter += 1
 		time.sleep(time)
 
-	averaged_read_values = [x / readings for x in read_running_total]
+	averaged_read_values = read_running_total / readings 
 	return averaged_read_values
