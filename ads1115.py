@@ -19,7 +19,23 @@ class Sensor:
 			time.sleep(0.1)
 
 		self.tareval = read_running_total / 10
+
+	def tare_value(self):
 		return self.tareval
+	
+	def read_sensor(sensor):
+		readings = 10
+		time = 0.05
+		read_counter = 0
+		read_running_total = 0
+
+		while read_counter < readings:
+			read_running_total += sensor.value
+			read_counter += 1
+			time.sleep(time)
+
+		averaged_read_values = read_running_total / readings 
+		return averaged_read_values
 
 def i2c_setup():
 	i2c = busio.I2C(board.SCL, board.SDA)
@@ -37,30 +53,4 @@ def port(number):
 	elif number == 3:
 		return ADS.P3
 
-def tare_sensors(sensor):
-	read_running_total = 0
-	read_counter = 0
 
-	while read_counter < 10:
-		read_running_total += sensor.value	
-		read_counter += 1
-		time.sleep(0.1)
-	averaged_read_values = [read_running_total / 10]
-	
-	return averaged_read_values
-
-
-
-def read_sensor(sensor):
-	readings = 10
-	time = 0.1
-	read_counter = 0
-	read_running_total = 0
-
-	while read_counter < readings:
-		read_running_total += sensor.value
-		read_counter += 1
-		time.sleep(time)
-
-	averaged_read_values = read_running_total / readings 
-	return averaged_read_values
