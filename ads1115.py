@@ -6,24 +6,19 @@ from adafruit_ads1x15.analog_in import AnalogIn
 
 class Sensor:
 	def __init__(self, ads, port):
-		self.ads = ads
-		self.port = port
+		self.sensor = AnalogIn(ads, port)
 		self.tareval = None
-	
-	def setup(self):
-		gas_sensor = AnalogIn(self.ads, self.port)
-		return (gas_sensor)
 	
 	def tare(self):
 		read_running_total = 0
 		read_counter = 0
 
 		while read_counter < 10:
-			read_running_total += self.value	
+			read_running_total += self.sensor.value	
 			read_counter += 1
 			time.sleep(0.1)
 
-		self.tareval = [read_running_total / 10]
+		self.tareval = read_running_total / 10
 		return self.tareval
 
 def i2c_setup():
