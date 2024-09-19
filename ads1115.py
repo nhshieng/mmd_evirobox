@@ -5,9 +5,12 @@ import adafruit_ads1x15.ads1115 as ADS
 from adafruit_ads1x15.analog_in import AnalogIn
 
 class Sensor:
-	def __init__(self, ads, port):
+	def __init__(self, ads, port, name):
 		self.sensor = AnalogIn(ads, port)
 		self.tareval = None
+		self.reading = None
+		self.name = name
+		self.flag = 0
 	
 	def tare(self):
 		read_running_total = 0
@@ -23,19 +26,19 @@ class Sensor:
 	def tare_value(self):
 		return self.tareval
 	
-	def read_sensor(sensor):
-		readings = 10
-		time = 0.05
+	def read_sensor(self):
+		readings = 5
+		read_delay = 0.05
 		read_counter = 0
 		read_running_total = 0
 
 		while read_counter < readings:
-			read_running_total += sensor.value
+			read_running_total += self.sensor.value
 			read_counter += 1
-			time.sleep(time)
+			time.sleep(read_delay)
 
-		averaged_read_values = read_running_total / readings 
-		return averaged_read_values
+		averaged_read_values = (read_running_total / readings) - self.tareval
+		self.reading = averaged_read_values
 
 def i2c_setup():
 	i2c = busio.I2C(board.SCL, board.SDA)
