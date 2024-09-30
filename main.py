@@ -47,7 +47,8 @@ def update_sensors(sensors):
 
 def print_readings(sensors):
 	for sensor in sensors:
-		print(sensor.reading, "  ", end="")
+		integer_number = sensor.reading
+		print(integer_number, "  ", end="")
 	print("")
 
 def check_gas_limit(sensors):
@@ -68,7 +69,7 @@ def check_gas_limit(sensors):
 def run_envirbox():
 	try:
 		ser.flushInput()
-		print(read_set_temp(ser))
+		#print(read_set_temp(ser))
 		tare_sensors(gas_sensors)
 		heater_start = False
 		gas_detected = False
@@ -92,11 +93,10 @@ def run_envirbox():
 		# Monitor temperature and gas sensors and act appropriately
 		while heater_start == True:
 			update_sensors(gas_sensors)
-			update_plot(gas_sensors)
 			#print_readings(gas_sensors)
 			flagged_sensors = check_gas_limit(gas_sensors)
 			if flagged_sensors:
-				#print("gas detected over limits")
+				print("gas detected over limits, temp set to 0C")
 				gas_detected = True
 				set_temp(ser, 0)
 			else:
@@ -111,30 +111,6 @@ def run_envirbox():
 	finally:	
 		ser.close()
 		print("Serial connection closed.")
-
-# Function to update the plot
-def update_plot(sensors):
-    # Read sensor data
-	for sensor in sensors:
-    	# Append the sensor value to the deque
-		plot_data.append(sensor.reading)
-    # Clear the current plot
-	plt.clf()
-    # Plot the data
-	plt.plot(plot_data)
-    # Set plot title and labels
-	plt.title("Sensor Data (Last 5 Minutes)")
-	plt.xlabel("Time (seconds)")
-	plt.ylabel("Sensor Value")
-
-	# Create a figure and axis for the plot
-	fig, ax = plt.subplots()
-
-	# Create an animation that updates the plot every second (1000 milliseconds)
-	ani = animation.FuncAnimation(fig, update_plot, interval=1000)
-
-	# Display the plot
-	plt.show()
 
 def button_click():
 	try:
