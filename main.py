@@ -96,12 +96,12 @@ def run_envirbox():
 			print_readings(gas_sensors)
 			flagged_sensors = check_gas_limit(gas_sensors)
 			if flagged_sensors:
-				print("gas detected over limits, temp set to 0C")
+				print(flagged_sensors, "over limit, temp set to 0C")
 				gas_detected = True
 				set_temp(ser, 0)
 			else:
-				#print("gas is not over limits")
 				if gas_detected is True:
+					print("Gas cleared, setting temp to ", TEST_TEMP)
 					gas_detected = False
 					set_temp(ser, TEST_TEMP)
 

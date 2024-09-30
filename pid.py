@@ -30,7 +30,6 @@ def construct_request(read_write, register_address, value):
 		read_write = READ_REGISTER
 	elif read_write == 'write':
 		read_write = WRITE_REGISTER
-	print("read/write:", read_write)
 	return bytes([SLAVE_ADDRESS, read_write]) + \
 		struct.pack('>HH', register_address, value) + \
 		calculate_crc(bytes([SLAVE_ADDRESS, read_write, register_address >> 8, register_address & 0xFF, value >> 8, value & 0xFF]))
