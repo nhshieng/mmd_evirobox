@@ -49,7 +49,6 @@ def print_readings(sensors):
 	for sensor in sensors:
 		integer_number = int(sensor.reading)
 		print(f"{integer_number:>{10}}", end="")
-	print("")
 
 def check_gas_limit(sensors):
 	for sensor in sensors:
@@ -81,12 +80,11 @@ def run_envirbox():
 		#print(flagged_sensors)
 
 		if not flagged_sensors:
-			#print("sensors do not detect gas")
+			print("")
 			heater_start = True
 			gas_detected = False
 			set_temp(ser, TEST_TEMP)
 		else:
-			#print(check_gas_limit(gas_sensors), "are over the acceptable limit.")
 			heater_start = False
 			gas_detected = True
 
@@ -97,7 +95,7 @@ def run_envirbox():
 			print_readings(gas_sensors)
 			flagged_sensors = check_gas_limit(gas_sensors)
 			if flagged_sensors:
-				print(flagged_sensors, "over limit, temp set to 0C")
+				print("        ", flagged_sensors, "over limit, temp set to 0C")
 				gas_detected = True
 				set_temp(ser, 0)
 			else:
@@ -106,8 +104,10 @@ def run_envirbox():
 					gas_detected = False
 					clear_timeout = 0
 					set_temp(ser, TEST_TEMP)
-				else:
+				elif gas_detected is True and clear_timeout < 10:
 					clear_timeout += 1
+				else:
+					print("")
 
 	except KeyboardInterrupt:
 		print("KeyboardInterrupt, exiting...")
