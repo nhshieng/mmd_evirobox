@@ -92,6 +92,7 @@ def run_envirbox():
 
 		# Monitor temperature and gas sensors and act appropriately
 		while heater_start == True:
+			clear_timeout = 0
 			update_sensors(gas_sensors)
 			print_readings(gas_sensors)
 			flagged_sensors = check_gas_limit(gas_sensors)
@@ -100,10 +101,13 @@ def run_envirbox():
 				gas_detected = True
 				set_temp(ser, 0)
 			else:
-				if gas_detected is True:
+				if gas_detected is True and clear_timeout == 10:
 					print("Gas cleared, setting temp to ", TEST_TEMP)
 					gas_detected = False
+					clear_timeout = 0
 					set_temp(ser, TEST_TEMP)
+				else:
+					clear_timeout += 1
 
 	except KeyboardInterrupt:
 		print("KeyboardInterrupt, exiting...")
