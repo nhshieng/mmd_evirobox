@@ -47,7 +47,7 @@ def update_sensors(sensors):
 
 def print_readings(sensors):
 	for sensor in sensors:
-		integer_number = sensor.reading
+		integer_number = int(sensor.reading)
 		print(integer_number, "  ", end="")
 	print("")
 
@@ -93,7 +93,7 @@ def run_envirbox():
 		# Monitor temperature and gas sensors and act appropriately
 		while heater_start == True:
 			update_sensors(gas_sensors)
-			#print_readings(gas_sensors)
+			print_readings(gas_sensors)
 			flagged_sensors = check_gas_limit(gas_sensors)
 			if flagged_sensors:
 				print("gas detected over limits, temp set to 0C")
