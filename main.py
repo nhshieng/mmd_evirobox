@@ -48,7 +48,7 @@ def update_sensors(sensors):
 def print_readings(sensors):
 	for sensor in sensors:
 		integer_number = int(sensor.reading)
-		print(integer_number, "  ", end="")
+		print(f"{integer_number:>{10}}", end="")
 	print("")
 
 def check_gas_limit(sensors):
