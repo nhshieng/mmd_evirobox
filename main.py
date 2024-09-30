@@ -89,8 +89,8 @@ def run_envirbox():
 			gas_detected = True
 
 		# Monitor temperature and gas sensors and act appropriately
+		clear_timeout = 0
 		while heater_start == True:
-			clear_timeout = 0
 			update_sensors(gas_sensors)
 			print_readings(gas_sensors)
 			flagged_sensors = check_gas_limit(gas_sensors)
@@ -105,6 +105,7 @@ def run_envirbox():
 					clear_timeout = 0
 					set_temp(ser, TEST_TEMP)
 				elif gas_detected is True and clear_timeout < 10:
+					print("Waiting for timeout to clear")
 					clear_timeout += 1
 				else:
 					print("")
