@@ -7,6 +7,10 @@ import struct
 import tkinter as tk
 from tkinter import messagebox
 
+import matplotlib.pyplot as plt
+import matplotlib.animation as animation
+from collections import deque
+
 GAS_LIMIT = 1000
 
 ads_1, ads_2 = i2c_setup()
@@ -31,6 +35,7 @@ TIMEOUT = 1
 TEST_TEMP = 32
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
+plot_data = deque(maxlen=600)
 
 def tare_sensors(sensors):
 	for sensor in sensors:
@@ -72,29 +77,30 @@ def run_envirbox():
 		update_sensors(gas_sensors)
 		print_readings(gas_sensors)
 		flagged_sensors = check_gas_limit(gas_sensors)
-		print(flagged_sensors)
+		#print(flagged_sensors)
 
 		if not flagged_sensors:
-			print("sensors do not detect gas")
+			#print("sensors do not detect gas")
 			heater_start = True
 			gas_detected = False
 			set_temp(ser, TEST_TEMP)
 		else:
-			print(check_gas_limit(gas_sensors), "are over the acceptable limit.")
+			#print(check_gas_limit(gas_sensors), "are over the acceptable limit.")
 			heater_start = False
 			gas_detected = True
 
 		# Monitor temperature and gas sensors and act appropriately
 		while heater_start == True:
-			update_sensors(gas_sensors)	
-			print_readings(gas_sensors)
+			update_sensors(gas_sensors)
+			update_plot(gas_sensors)
+			#print_readings(gas_sensors)
 			flagged_sensors = check_gas_limit(gas_sensors)
 			if flagged_sensors:
-				print("gas detected over limits")
+				#print("gas detected over limits")
 				gas_detected = True
 				set_temp(ser, 0)
 			else:
-				print("gas is not over limits")
+				#print("gas is not over limits")
 				if gas_detected is True:
 					gas_detected = False
 					set_temp(ser, TEST_TEMP)
@@ -105,6 +111,31 @@ def run_envirbox():
 	finally:	
 		ser.close()
 		print("Serial connection closed.")
+
+# Function to update the plot
+def update_plot(sensors):
+    # Read sensor data
+	for sensor in sensors:
+    	sensor_value = sensor.reading
+    	# Append the sensor value to the deque
+    	plot_data.append(sensor_value)
+    # Clear the current plot
+    plt.clf()
+    # Plot the data
+    plt.plot(plot_data)
+    # Set plot title and labels
+    plt.title("Sensor Data (Last 5 Minutes)")
+    plt.xlabel("Time (seconds)")
+    plt.ylabel("Sensor Value")
+
+# Create a figure and axis for the plot
+fig, ax = plt.subplots()
+
+# Create an animation that updates the plot every second (1000 milliseconds)
+ani = animation.FuncAnimation(fig, update_plot, interval=1000)
+
+# Display the plot
+plt.show()
 
 def button_click():
 	try:
@@ -131,14 +162,3 @@ def button_click():
 
 if __name__ == "__main__":
 	run_envirbox()
-
-
-    
-
-#try:
-#	ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-#	temp_ramp_test(3600)
-#	ser.close()
-	
-#except KeyboardInterrupt:
-#	ser.close()
