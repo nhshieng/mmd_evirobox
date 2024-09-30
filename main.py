@@ -100,12 +100,12 @@ def run_envirbox():
 				set_temp(ser, 0)
 			else:
 				if gas_detected is True and clear_timeout == 10:
-					print("          Gas cleared, setting temp to ", TEST_TEMP)
+					print("         Gas cleared, setting temp to ", TEST_TEMP, "C")
 					gas_detected = False
 					clear_timeout = 0
 					set_temp(ser, TEST_TEMP)
 				elif gas_detected is True and clear_timeout < 10:
-					print("          Waiting for timeout to clear")
+					print("         Waiting for timeout to clear")
 					clear_timeout += 1
 				else:
 					print("")
