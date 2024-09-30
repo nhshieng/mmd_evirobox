@@ -116,26 +116,25 @@ def run_envirbox():
 def update_plot(sensors):
     # Read sensor data
 	for sensor in sensors:
-    	sensor_value = sensor.reading
     	# Append the sensor value to the deque
-    	plot_data.append(sensor_value)
+		plot_data.append(sensor.reading)
     # Clear the current plot
-    plt.clf()
+	plt.clf()
     # Plot the data
-    plt.plot(plot_data)
+	plt.plot(plot_data)
     # Set plot title and labels
-    plt.title("Sensor Data (Last 5 Minutes)")
-    plt.xlabel("Time (seconds)")
-    plt.ylabel("Sensor Value")
+	plt.title("Sensor Data (Last 5 Minutes)")
+	plt.xlabel("Time (seconds)")
+	plt.ylabel("Sensor Value")
 
-# Create a figure and axis for the plot
-fig, ax = plt.subplots()
+	# Create a figure and axis for the plot
+	fig, ax = plt.subplots()
 
-# Create an animation that updates the plot every second (1000 milliseconds)
-ani = animation.FuncAnimation(fig, update_plot, interval=1000)
+	# Create an animation that updates the plot every second (1000 milliseconds)
+	ani = animation.FuncAnimation(fig, update_plot, interval=1000)
 
-# Display the plot
-plt.show()
+	# Display the plot
+	plt.show()
 
 def button_click():
 	try:
