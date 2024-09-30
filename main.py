@@ -32,7 +32,7 @@ SLAVE_ADDRESS = 1
 SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 TIMEOUT = 1
-TEST_TEMP = 32
+TEST_TEMP = 37
 
 ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
 plot_data = deque(maxlen=600)
@@ -100,12 +100,12 @@ def run_envirbox():
 				set_temp(ser, 0)
 			else:
 				if gas_detected is True and clear_timeout == 10:
-					print("Gas cleared, setting temp to ", TEST_TEMP)
+					print("          Gas cleared, setting temp to ", TEST_TEMP)
 					gas_detected = False
 					clear_timeout = 0
 					set_temp(ser, TEST_TEMP)
 				elif gas_detected is True and clear_timeout < 10:
-					print("Waiting for timeout to clear")
+					print("          Waiting for timeout to clear")
 					clear_timeout += 1
 				else:
 					print("")
