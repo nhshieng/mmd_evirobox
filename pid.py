@@ -6,7 +6,7 @@ READ_REGISTER = 0x03
 WRITE_REGISTER = 0x06
 SLAVE_ADDRESS = 1
 
-SERIAL_PORT = '/dev/ttyACM0'
+SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 TIMEOUT = 1
 
@@ -30,23 +30,23 @@ def construct_request(read_write, register_address, value):
 		read_write = READ_REGISTER
 	elif read_write == 'write':
 		read_write = WRITE_REGISTER
-
+	print("read/write:", read_write)
 	return bytes([SLAVE_ADDRESS, read_write]) + \
 		struct.pack('>HH', register_address, value) + \
 		calculate_crc(bytes([SLAVE_ADDRESS, read_write, register_address >> 8, register_address & 0xFF, value >> 8, value & 0xFF]))
 
 
-def set_temp(temp):
+def set_temp(ser, temp):
 	temp_sent = temp * 10
 	request = construct_request('write', 0, temp_sent)
 	ser.write(request)
 
 
-def read_temp():
+def read_temp(ser):
 	request = construct_request('read', 1, 1)
 	ser.write(request)
 	response = ser.read(7)
-
+	print("pid response", response)
 	if len(response) == 7:
 		data_bytes = response[3:5]
 		value = struct.unpack('>h', data_bytes)[0]
@@ -56,9 +56,10 @@ def read_temp():
 		print ("invalid length")
 
 
-def read_set_temp():
+def read_set_temp(ser):
 	request = construct_request('read', 0, 1)
 	ser.write(request)
+	print(request)
 	response = ser.read(7)
 
 	if len(response) == 7:
@@ -70,7 +71,7 @@ def read_set_temp():
 		print ("invalid length")
 	
 
-def temp_ramp_test(dwell_time):
+def temp_ramp_test(ser, dwell_time):
 	print ('Beginning Temperature Ramp Testing')
 
 	testing_temps = [27, 30, 35, 37, 40]

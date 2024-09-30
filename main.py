@@ -25,14 +25,15 @@ READ_REGISTER = 0x03
 WRITE_REGISTER = 0x06
 SLAVE_ADDRESS = 1
 
-SERIAL_PORT = '/dev/ttyACM0'
+SERIAL_PORT = '/dev/ttyUSB0'
 BAUD_RATE = 115200
 TIMEOUT = 1
-TEST_TEMP = 37
+TEST_TEMP = 32
 
+ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
 
-def tare_sensors():
-	for sensor in gas_sensors:
+def tare_sensors(sensors):
+	for sensor in sensors:
 		sensor.tare()
 
 def update_sensors(sensors):
@@ -61,17 +62,23 @@ def check_gas_limit(sensors):
 
 def run_envirbox():
 	try:
-		ser = serial.Serial(SERIAL_PORT, BAUD_RATE, timeout=TIMEOUT)
-		tare_sensors()
+		ser.flushInput()
+		print(read_set_temp(ser))
+		tare_sensors(gas_sensors)
 		heater_start = False
 		gas_detected = False
 
 		# Start up by checking presence of gas before turning on the heater
 		update_sensors(gas_sensors)
-		if check_gas_limit(gas_sensors) is None:
+		print_readings(gas_sensors)
+		flagged_sensors = check_gas_limit(gas_sensors)
+		print(flagged_sensors)
+
+		if not flagged_sensors:
+			print("sensors do not detect gas")
 			heater_start = True
 			gas_detected = False
-			set_temp(TEST_TEMP)
+			set_temp(ser, TEST_TEMP)
 		else:
 			print(check_gas_limit(gas_sensors), "are over the acceptable limit.")
 			heater_start = False
@@ -81,14 +88,16 @@ def run_envirbox():
 		while heater_start == True:
 			update_sensors(gas_sensors)	
 			print_readings(gas_sensors)
-
-			if check_gas_limit(gas_sensors) is True:
+			flagged_sensors = check_gas_limit(gas_sensors)
+			if flagged_sensors:
+				print("gas detected over limits")
 				gas_detected = True
-				set_temp(0)
+				set_temp(ser, 0)
 			else:
+				print("gas is not over limits")
 				if gas_detected is True:
 					gas_detected = False
-					set_temp(TEST_TEMP)
+					set_temp(ser, TEST_TEMP)
 
 	except KeyboardInterrupt:
 		print("KeyboardInterrupt, exiting...")
